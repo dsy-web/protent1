@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>请假申请</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            position: relative;
+            width: 1000px;  /* 容器宽度增大 */
+            height: 800px; /* 容器高度增大 */
+            padding: 40px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+
+        .container h2 {
+            margin: 20px 0;
+            font-size: 35px; /* 增大标题字体 */
+        }
+
+        .smiley, .crying, .sad {
+            font-size: 100px; /* 增大表情 */
+            transition: font-size 0.3s ease; /* 使表情变化更加平滑 */
+            margin-bottom: 30px; /* 增加表情和下面元素的间距 */
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-evenly; /* 确保按钮水平排列并有足够间距 */
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 25px 50px;
+            font-size: 25px; /* 增大按钮字体 */
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin: 15px;
+        }
+
+        .approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .reject {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .message {
+            margin-top: 40px;
+            font-size: 24px;  /* 增大信息字体 */
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* 玫瑰背景样式 */
+        .rose-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://yourimagepath.com/rose.jpg'); /* 使用您提供的玫瑰图片链接 */
+            background-size: cover;
+            background-position: center;
+            z-index: -1;  /* 背景位于其他元素下方 */
+        }
+
+        /* 隐藏按钮 */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>刘姐，俺请假呀！望批准！</h2>
+    <div class="smiley" id="face">😊</div>
+
+    <div class="buttons">
+        <button class="button approve" onclick="approveRequest()">同意</button>
+        <button class="button reject" onclick="rejectRequest()">拒绝</button>
+    </div>
+
+    <!-- 显示动态文字 -->
+    <div class="message" id="dynamicMessage"></div>
+
+    <!-- 玫瑰背景部分 -->
+    <div id="roseSection" class="hidden"></div>
+</div>
+
+<script>
+    let rejectCount = 0;
+    let scaleFactor = 1.2; // 初始放大比例
+    let faceSize = 100; // 初始表情大小为100px
+    const scaleAmount = 0.15; // 每次放大的比例调整为0.15，约为1厘米
+    const faceSizeIncrease = 10; // 每次表情大小增加10px，约为1厘米
+
+    // 更新动态文字
+    function updateMessage(message, color) {
+        const messageElement = document.getElementById("dynamicMessage");
+        messageElement.innerText = message;
+        messageElement.style.fontSize = (parseInt(window.getComputedStyle(messageElement).fontSize) + 28) + "px"; // 增加1厘米（28px）
+        messageElement.style.color = color; // 更改颜色
+    }
+
+    // 同意按钮的功能
+    function approveRequest() {
+        // 隐藏拒绝按钮并显示玫瑰
+        document.querySelector('.reject').classList.add('hidden');
+        document.querySelector('.approve').classList.add('hidden');
+        
+        // 显示玫瑰背景
+        document.getElementById("roseSection").classList.remove('hidden');
+        document.querySelector('.container').classList.add('rose-background');  // 背景设置为玫瑰图片
+
+        // 更新文字
+        updateMessage("谢谢刘姐，嘻嘻", "green");
+        
+        // 更改表情
+        document.getElementById('face').innerText = "😊";  // 更改为微笑表情
+    }
+
+    // 拒绝按钮的功能
+    function rejectRequest() {
+        rejectCount++;
+
+        const rejectButton = document.querySelector('.reject');
+        const approveButton = document.querySelector('.approve');
+        const face = document.getElementById('face');
+        
+        // 限制拒绝按钮的最大移动幅度为5厘米（约140px）
+        const maxX = 140; // 5cm
+        const maxY = 140; // 5cm
+
+        const randomX = Math.random() * maxX;
+        const randomY = Math.random() * maxY;
+        
+        rejectButton.style.transform = `translate(${randomX}px, ${randomY}px)`;  // 移动拒绝按钮
+
+        // 每次点击拒绝按钮，同意按钮逐渐增大
+        scaleFactor += scaleAmount; // 每次增加放大比例
+        approveButton.style.transform = `scale(${scaleFactor})`;
+
+        // 表情大小增加
+        faceSize += faceSizeIncrease; // 每点击一次增加表情大小
+        face.style.fontSize = faceSize + "px";
+
+        // 根据点击次数进行不同的操作
+        if (rejectCount === 5) {
+            updateMessage("伤心啦，伤心啦", "red");
+            face.innerText = "😢";  // 换成哭泣表情
+        } else if (rejectCount === 8) {
+            updateMessage("刘姐，您快同意嘛", "blue");
+            face.innerText = "😞";  // 换成伤心表情
+        }
+    }
+</script>
+
+</body>
+</html>
